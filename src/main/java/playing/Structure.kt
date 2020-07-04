@@ -33,7 +33,8 @@ class GraphProblem(
     }
 
     override fun pathCost(costSoFar: Int, state1: State, action: Action, state2: State): Int {
-        return costSoFar + graph[state1][state2] ?: Int.MAX_VALUE
+        return costSoFar + (graph[state1]?.get(state2) ?: Int.MAX_VALUE)
+
     }
 
 }
