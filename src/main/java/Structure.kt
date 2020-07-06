@@ -1,6 +1,6 @@
 class State(val stateName: String) {
     override fun equals(other: Any?): Boolean {
-        return stateName == (other as State).stateName
+        return other is State && stateName == other.stateName
     }
 
     override fun hashCode(): Int {
@@ -45,7 +45,7 @@ class GraphProblem(
     }
 
     override fun result(state: State, action: Action): State {
-        return graph.getDestState(state, action)
+        return graph.getDestState(action)
     }
 
     override fun pathCost(costSoFar: Int, state1: State, action: Action, state2: State): Int {
@@ -92,7 +92,7 @@ open class Graph(
     }
 
     //get result from current state with an action
-    fun getDestState(state: State, action: Action): State {
+    fun getDestState(action: Action): State {
         return action.destState
     }
 
@@ -114,8 +114,8 @@ class Node(
         val state: State,
         private val parent: Node? = null,
         private val action: Action? = null,
-        private val pathCost: Int = 0
-) {
+        val pathCost: Int = 0
+) : Comparable<Node> {
     private var depth: Int = 0
 
     init {
@@ -172,6 +172,10 @@ class Node(
 
     override fun toString(): String {
         return "Node(state=${state.stateName})"
+    }
+
+    override fun compareTo(other: Node): Int {
+        return pathCost.compareTo(other.pathCost)
     }
 
 }

@@ -56,6 +56,6 @@ fun main() {
     )
 
     val problem = GraphProblem(State("Arad"), listOf(State("Bucharest")), romaniaMap)
-    val nodeGoal = Agent.bfs(problem)
+    val nodeGoal = Agent.uniformCostSearch(problem)
     println(nodeGoal?.solution())
 }
