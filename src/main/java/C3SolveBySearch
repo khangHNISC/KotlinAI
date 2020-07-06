@@ -1,0 +1,47 @@
+Focus:
+    1. goal-base agent
+    2. Atomic Rep: states consider as whole, no internal structure
+    3. Uninformed vs Informed
+
+
+Arad to Burcharest
+    RouteFinding Problem
+    Given:
+        observable env: know about it s current state
+        discrete env: given state finite actions
+        know env: which states are reached by each action
+        deterministic: each action has one outcome
+
+Define problem
+    1. Init state
+        In(Arad)
+    2. Possible Actions
+        Actions (state s) : Actions ( In(Arad) ) { Go (Sibu), Go (Timisoara), Go (Zerind) }
+    3. Transition model
+        Result ( In(Arad), Go(Zerind) ) = In(Zerind)
+    //These 3 above forms a state space of the problem
+    4. Goal test
+        Set { In(Bucharest) }
+    5. Path cost function
+    6. States:
+
+Searching for Solutions:
+    search tree, satate = node
+    expanding current state and generate new set of state
+    frontier = open list
+    explored set = close list
+
+Measuring performance
+    Completeness: Guaranteed to find solution
+    Optimality: find optimal solution
+    Time complexity: how long
+    Space: How much memory
+
+    Graph: Branching Factor (max successors) and depth (shallowest node)
+
+UnInformed Search:
+    Doesnt know which non-goal state is more promising
+
+    BFS:
+        _ optimal if same path cost
+        _ O(b^d) time and space

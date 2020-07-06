@@ -1,0 +1,70 @@
+Agent perceives env via sensors and acting through actuators
+
+sensor: monitor changes
+actuators: control the changes
+percept: perceptual input at any given time
+percept sequence: complete history has perceived
+agent function: map percept sequence to action
+agent program: implement the agent function
+rational agent: one does the right thing
+performance measure: eval any given sequence of env states
+
+rational agent:
+    for each possible percept sequence, a rational agent should select an action
+    expected to max its performance measure, given the evidence provided by the percept
+    sequence and whatever built in knowledge the agent has
+
+omniscience: know the out come to act
+learning: gain more experiment -> act more correct
+autonomy: relies on knowlege of designer rather than own percepts
+PEAS: performance, evn, Actuators, sensors
+
+ENV:
+    Fully observable vs partially observable vs unobservable
+    Single agent vs multiagent
+        competitive or cooperative
+    Deterministic vs stochastic
+    Episodic vs sequential
+    Static vs Dynamic
+    Discrete vs Continuous
+    Known vs unknown
+
+Agent:
+    1. Simple reflex Agent (percept) => action
+        INTERPRET-INPUT(percept) -> state
+        RULE-MATCH (state, rules) -> rule
+        rule.ACTION -> action
+        return action
+    //ignore the percept history
+    //useless if rule to large
+    //infinite loop is unavoidable
+
+    2. Model-based-reflex-agent (percept) => action
+        //handle partially observable env
+        // 4 12 11 15 17 25
+        persistent: state: current world state
+                    model: how next state depends on current state and action
+                    action: most recent action, initially none
+
+        UPDATE-STATE (state, action, percept, model) -> state
+        RULE_MATCH (State, rules) -> rule
+        rule.ACTION -> action
+        return action
+
+    3. GOAL-based agents
+        //Search (3, 5) and planning (10 11) to find action sequences
+
+    4. Utility-based agents
+        //based on utility function to measure preferences among states
+        //choose action that leads to best expected utility (16)
+
+    5. Learning agents
+        learning element : making improvements
+        performance element : selecting external actions
+        critic: how agents is doing
+        problem generator:
+
+ Level of representation
+    Atomic: state has no internal structure 3 5 15 17
+    factored: splits each state into variables and attribures 6 7 10 11 13 16 18 20 21
+    structured: 8 9 12 14 19 22 23
