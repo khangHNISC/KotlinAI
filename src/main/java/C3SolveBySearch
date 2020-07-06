@@ -45,3 +45,8 @@ UnInformed Search:
     BFS:
         _ optimal if same path cost
         _ O(b^d) time and space
+    DFS:
+        _ not optimal (afraid infinite state space)
+        _ Tree Search (not avoid redundant path) is incomplete
+        _ require only O(bm) storage (m = max depth)
+

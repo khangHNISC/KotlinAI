@@ -110,7 +110,7 @@ class UndirectedGraph(
 ) : Graph(graphDict, false)
 
 
-class Node(
+open class Node(
         val state: State,
         private val parent: Node? = null,
         private val action: Action? = null,
@@ -179,3 +179,6 @@ class Node(
     }
 
 }
+
+
+class NodeCutOff : Node(State(""))
