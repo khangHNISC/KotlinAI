@@ -1,3 +1,6 @@
+import java.awt.Point
+import java.util.Collections.min
+
 class State(val stateName: String) {
     override fun equals(other: Any?): Boolean {
         return other is State && stateName == other.stateName
@@ -52,11 +55,27 @@ class GraphProblem(
         return costSoFar + graph.getCost(state1, state2)
     }
 
+    fun findMinEdge(): Int {
+        var m = Integer.MAX_VALUE
+        for (action in graph.graphDict.values) {
+            val localMin = min(action.values)
+            m = Math.min(localMin, m)
+        }
+        return m
+    }
+
+    fun h(node: Node): Int {
+        val locs = graph.location
+        if (locs != null)
+            return locs.get(node.state)?.distance(locs[goal.first()])?.toInt() ?: Int.MAX_VALUE
+        else return Int.MAX_VALUE
+    }
 }
 
 
 open class Graph(
-        private val graphDict: Map<State, Map<State, Int>>,
+        val graphDict: Map<State, Map<State, Int>>,
+        var location: Map<State, Point>? = null,
         directed: Boolean = true
 ) {
     private val graphDictConstructed: MutableMap<State, MutableMap<State, Int>> = mutableMapOf()
@@ -107,7 +126,7 @@ open class Graph(
 
 class UndirectedGraph(
         graphDict: Map<State, Map<State, Int>>
-) : Graph(graphDict, false)
+) : Graph(graphDict, directed = false)
 
 
 open class Node(

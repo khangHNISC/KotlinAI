@@ -49,7 +49,4 @@ UnInformed Search:
         _ not optimal (afraid infinite state space)
         _ Tree Search (not avoid redundant path) is incomplete
         _ require only O(bm) storage (m = max depth)
-    DLS:
-        _ choose max depth l avoid infinte state
-        _ incomplete if choose l < d and non optimal if d < l
 
