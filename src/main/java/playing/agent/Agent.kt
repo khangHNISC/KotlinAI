@@ -10,6 +10,39 @@ import kotlin.collections.ArrayDeque
 object Agent {
 
     /**
+     * BFS - tree search
+     */
+    @ExperimentalStdlibApi
+    fun bfsTree(problem: Problem): Node? {
+        val frontier = ArrayDeque(listOf(Node(problem.initial)))
+        while (frontier.isNotEmpty()) {
+            val node = frontier.removeFirst()
+            for (child in node.expand(problem)) {
+                if (problem.goalTest(node.state)) return node
+                frontier.addLast(child)
+            }
+        }
+        return null
+    }
+
+
+    /**
+     * DFS tree search
+     */
+    @ExperimentalStdlibApi
+    fun dfsTree(problem: Problem): Node? {
+        val frontier = ArrayDeque(listOf(Node(problem.initial)))
+        while (frontier.isNotEmpty()) {
+            val node = frontier.removeFirst()
+            for (child in node.expand(problem)) {
+                if (problem.goalTest(node.state)) return node
+                frontier.addFirst(node)
+            }
+        }
+        return null
+    }
+
+    /**
      * BFS - graph search
      */
     @ExperimentalStdlibApi
@@ -18,7 +51,7 @@ object Agent {
         if (problem.goalTest(node.state)) return node
         val frontier = ArrayDeque(listOf(node))
         val explored = mutableSetOf<State>()
-        while (frontier.size != 0) {
+        while (frontier.isNotEmpty()) {
             node = frontier.removeFirst()
             explored.add(node.state)
             for (child in node.expand(problem)) {
@@ -36,11 +69,10 @@ object Agent {
      */
     @ExperimentalStdlibApi
     fun uniformCostSearch(problem: Problem): Node? {
-        var node = Node(problem.initial, pathCost = 0)
-        val frontier = PriorityQueue(listOf(node))
+        val frontier = PriorityQueue(listOf(Node(problem.initial, pathCost = 0)))
         val explored = mutableSetOf<State>()
-        while (frontier.size != 0) {
-            node = frontier.poll()
+        while (frontier.isNotEmpty()) {
+            val node = frontier.poll()
             //return at selected for expansion since node found can be in suboptimal path
             if (problem.goalTest(node.state)) return node
             explored.add(node.state)
@@ -63,11 +95,10 @@ object Agent {
      */
     @ExperimentalStdlibApi
     fun dfs(problem: Problem): Node? {
-        var node = Node(problem.initial)
-        val frontier = ArrayDeque(listOf(node))
+        val frontier = ArrayDeque(listOf(Node(problem.initial)))
         val explored = mutableSetOf<State>()
-        while (frontier.size != 0) {
-            node = frontier.removeFirst()
+        while (frontier.isNotEmpty()) {
+            val node = frontier.removeFirst()
             if (problem.goalTest(node.state)) return node
             explored.add(node.state)
             for (child in node.expand(problem)) {

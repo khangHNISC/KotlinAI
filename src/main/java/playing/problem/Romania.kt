@@ -55,7 +55,7 @@ fun main() {
             State("Urziceni") to mutableMapOf(State("Vaslui") to 142))
     )
 
-    val problem = GraphProblem(State("Arad"), listOf(State("Bucharest")), romaniaMap)
-    val nodeGoal = Agent.depthLimitedSearch(problem)
+    val problem = GraphProblem(State("Neamt"), listOf(State("Timisoara")), romaniaMap)
+    val nodeGoal = Agent.bfsTree(problem)
     println(nodeGoal?.solution())
 }
