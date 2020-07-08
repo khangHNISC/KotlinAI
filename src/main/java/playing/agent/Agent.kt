@@ -6,9 +6,9 @@ import NodeCutOff
 import Problem
 import State
 import java.util.*
-import java.util.Collections.min
-import java.util.stream.IntStream.range
 import kotlin.collections.ArrayDeque
+import kotlin.math.max
+import kotlin.math.min
 
 object Agent {
 
@@ -117,7 +117,7 @@ object Agent {
     /**
      * dfs limited level
      */
-    fun depthLimitedSearch(problem: Problem, limit: Int = 5): Node? {
+    private fun depthLimitedSearch(problem: Problem, limit: Int = 5): Node? {
         fun recursiveDLS(node: Node, problem: Problem, limit: Int): Node? {
             when {
                 problem.goalTest(node.state) -> return node
@@ -138,7 +138,7 @@ object Agent {
 
 
     fun iterativeDeepeningSearch(problem: Problem): Node? {
-        for (depth in range(0, Int.MAX_VALUE)) {
+        for (depth in 0..Int.MAX_VALUE) {
             val node = depthLimitedSearch(problem, depth)
             if (node != NodeCutOff()) {
                 println("depth :$depth")
@@ -155,17 +155,37 @@ object Agent {
         val (gf, gb) = Pair({ Node(problem.initial) to 0 }, { Node(problem.goal.first()) to 0 })
         val (openF, openB) = Pair(listOf(Node(problem.initial)), listOf(Node(problem.goal.first())))
         val (closeF, closeB) = Pair(listOf<Node>(), listOf<Node>())
-        var U = Integer.MAX_VALUE
+        var u = Integer.MAX_VALUE
 
         fun extend(
-                U: Int,
+                u: Int,
                 openDir: List<Node>,
                 openOther: List<Node>,
                 gDir: Pair<Node, Int>,
                 gOther: Pair<Node, Int>,
                 closedDir: List<Node>) {
             //Extend search in given direction
-            
+
+            fun findKey(prMin: Int, openDir: List<Node>, g: Map<Node, Int>): Node {
+                //Finds key in open_dir with value equal to pr_min and minimum g value.
+                var m = Integer.MAX_VALUE
+                var node: Node = NodeCutOff()
+                for (n in openDir) {
+                    val gVal = (g[n] ?: 0)
+                    val f = gVal + (problem as GraphProblem).h(n)
+                    val pr = max(f, 2 * gVal)
+                    if (pr == prMin) {
+                        if (gVal < m) {
+                            m = gVal
+                            node = n
+                        }
+                    }
+                }
+                return node
+            }
+
+            val n = findKey()
+
         }
 
         fun findMin(openDir: List<Node>, g: Map<Node, Int>): Triple<Int, Int, Int> {
@@ -173,29 +193,11 @@ object Agent {
             var (prMin, prMinF) = Pair(Int.MAX_VALUE, Int.MAX_VALUE)
             for (n in openDir) {
                 val f = (g[n] ?: 0) + (problem as GraphProblem).h(n)
-                val pr = Math.max(f, 2 * (g[n] ?: 0))
-                prMin = Math.min(prMin, pr)
-                prMinF = Math.min(prMinF, f)
+                val pr = max(f, 2 * (g[n] ?: 0))
+                prMin = min(prMin, pr)
+                prMinF = min(prMinF, f)
             }
-            return Triple(prMin, prMinF, min(g.values))
-        }
-
-        fun findKey(prMin: Int, openDir: List<Node>, g: Map<Node, Int>): Node {
-            //Finds key in open_dir with value equal to pr_min and minimum g value.
-            var m = Integer.MAX_VALUE
-            var node: Node = NodeCutOff()
-            for (n in openDir) {
-                val gVal = (g[n] ?: 0)
-                val f = gVal + (problem as GraphProblem).h(n)
-                val pr = Math.max(f, 2 * gVal)
-                if (pr == prMin) {
-                    if (gVal < m) {
-                        m = gVal
-                        node = n
-                    }
-                }
-            }
-            return node
+            return Triple(prMin, prMinF, Collections.min(g.values))
         }
         return null
     }
