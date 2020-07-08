@@ -2,10 +2,10 @@ package playing.problem
 
 import GraphProblem
 import Node
-import Problem
 import State
 import UndirectedGraph
 import playing.agent.Agent
+import java.awt.Point
 
 @ExperimentalStdlibApi
 fun main() {
@@ -55,7 +55,17 @@ fun main() {
             State("Urziceni") to mutableMapOf(State("Vaslui") to 142))
     )
 
-    val problem = GraphProblem(State("Neamt"), listOf(State("Timisoara")), romaniaMap)
-    val nodeGoal = Agent.bfsTree(problem)
+    romaniaMap.location = mapOf(
+            State("Arad") to Point(91, 492), State("Bucharest") to Point(400, 327), State("Craiova") to Point(253, 288),
+            State("Drobeta") to Point(165, 299), State("Eforie") to Point(562, 293), State("Fagaras") to Point(305, 449),
+            State("Giurgiu") to Point(375, 270), State("Hirsova") to Point(534, 350), State("Iasi") to Point(473, 506),
+            State("Lugoj") to Point(165, 379), State("Mehadia") to Point(168, 339), State("Neamt") to Point(406, 537),
+            State("Oradea") to Point(131, 571), State("Pitesti") to Point(320, 368), State("Rimnicu") to Point(233, 410),
+            State("Sibiu") to Point(207, 457), State("Timisoara") to Point(94, 410), State("Urziceni") to Point(456, 350),
+            State("Vaslui") to Point(509, 444), State("Zerind") to Point(108, 531)
+    )
+
+    val problem = GraphProblem(State("Arad"), listOf(State("Bucharest")), romaniaMap)
+    val nodeGoal = Agent.iterativeDeepeningSearch(problem)
     println(nodeGoal?.solution())
 }
