@@ -6,6 +6,7 @@ import NodeCutOff
 import Problem
 import State
 import java.util.*
+import java.util.Collections.min
 import java.util.stream.IntStream.range
 import kotlin.collections.ArrayDeque
 
@@ -163,18 +164,39 @@ object Agent {
                 gDir: Pair<Node, Int>,
                 gOther: Pair<Node, Int>,
                 closedDir: List<Node>) {
-
+            //Extend search in given direction
+            
         }
 
-        fun findMin(openDir: List<Node>, g:  Pair<Node, Int>){
-
+        fun findMin(openDir: List<Node>, g: Map<Node, Int>): Triple<Int, Int, Int> {
+            //Finds minimum priority, g and f values in open_dir
+            var (prMin, prMinF) = Pair(Int.MAX_VALUE, Int.MAX_VALUE)
+            for (n in openDir) {
+                val f = (g[n] ?: 0) + (problem as GraphProblem).h(n)
+                val pr = Math.max(f, 2 * (g[n] ?: 0))
+                prMin = Math.min(prMin, pr)
+                prMinF = Math.min(prMinF, f)
+            }
+            return Triple(prMin, prMinF, min(g.values))
         }
 
-        fun findKey(prMin: Int, openDir: List<Node>, g: Pair<Node, Int>) {
+        fun findKey(prMin: Int, openDir: List<Node>, g: Map<Node, Int>): Node {
             //Finds key in open_dir with value equal to pr_min and minimum g value.
-            val m = Integer.MAX_VALUE
+            var m = Integer.MAX_VALUE
+            var node: Node = NodeCutOff()
+            for (n in openDir) {
+                val gVal = (g[n] ?: 0)
+                val f = gVal + (problem as GraphProblem).h(n)
+                val pr = Math.max(f, 2 * gVal)
+                if (pr == prMin) {
+                    if (gVal < m) {
+                        m = gVal
+                        node = n
+                    }
+                }
+            }
+            return node
         }
-
         return null
     }
 }
