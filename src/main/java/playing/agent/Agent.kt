@@ -123,6 +123,7 @@ object Agent {
                 else -> {
                     var cutoffOccurred = false
                     for (child in node.expand(problem)) {
+                        println(child)
                         val result = recursiveDLS(child, problem, limit - 1)
                         if (result is NodeCutOff) cutoffOccurred = true
                         else if (result != null) return result
@@ -134,3 +135,5 @@ object Agent {
         return recursiveDLS(Node(problem.initial), problem, limit)
     }
 }
+//inorder post order pre order
+//https://eli.thegreenplace.net/2015/directed-graph-traversal-orderings-and-applications-to-data-flow-analysis/#:~:text=When%20traversing%20trees%20with%20DFS,after%20recursing%20into%20its%20children.
