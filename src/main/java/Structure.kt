@@ -33,7 +33,7 @@ abstract class Problem(open val initial: State, open val goal: List<State>) {
     fun goalTest(state: State): Boolean = goal.contains(state)
 
     //total cost to 2
-    abstract fun pathCost(costSoFar: Int, state1: State, action: Action, state2: State): Int
+    abstract fun pathCost(costSoFar: Int, state1: State, action: Action?, state2: State): Int
 }
 
 
@@ -51,7 +51,7 @@ class GraphProblem(
         return graph.getDestState(action)
     }
 
-    override fun pathCost(costSoFar: Int, state1: State, action: Action, state2: State): Int {
+    override fun pathCost(costSoFar: Int, state1: State, action: Action?, state2: State): Int {
         return costSoFar + graph.getCost(state1, state2)
     }
 
@@ -196,7 +196,6 @@ open class Node(
     override fun compareTo(other: Node): Int {
         return pathCost.compareTo(other.pathCost)
     }
-
 }
 
 

@@ -1,7 +1,21 @@
-import java.awt.Point
+class Quadruple(
+        private val w: Int,
+        private val x: MutableList<Node>,
+        private val y: MutableList<Node>,
+        private val z: MutableMap<Node, Int>) {
+    operator fun component1(): Int {
+        return w
+    }
 
-class Quadrupple(w: Int, x: Int, y: Int, z: Int)
+    operator fun component2(): MutableList<Node> {
+        return x
+    }
 
-fun distance(a: Point, b: Point): Double {
-    return a.distance(b)
+    operator fun component3(): MutableList<Node> {
+        return y
+    }
+
+    operator fun component4(): MutableMap<Node, Int> {
+        return z
+    }
 }

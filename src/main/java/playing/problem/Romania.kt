@@ -1,7 +1,6 @@
 package playing.problem
 
 import GraphProblem
-import Node
 import State
 import UndirectedGraph
 import playing.agent.Agent
@@ -66,6 +65,5 @@ fun main() {
     )
 
     val problem = GraphProblem(State("Arad"), listOf(State("Bucharest")), romaniaMap)
-    val nodeGoal = Agent.iterativeDeepeningSearch(problem)
-    println(nodeGoal?.solution())
+    val nodeGoal = Agent.simpleBidirectionalSearch(problem)
 }
