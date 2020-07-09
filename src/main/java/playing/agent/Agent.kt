@@ -73,25 +73,7 @@ object Agent {
      */
     @ExperimentalStdlibApi
     fun uniformCostSearch(problem: Problem): Node? {
-        val frontier = PriorityQueue(listOf(Node(problem.initial, pathCost = 0)))
-        val explored = mutableSetOf<State>()
-        while (frontier.isNotEmpty()) {
-            val node = frontier.poll()
-            //return at selected for expansion since node found can be in suboptimal path
-            if (problem.goalTest(node.state)) return node
-            explored.add(node.state)
-            for (child in node.expand(problem)) {
-                if (child.state !in explored && child !in frontier) {
-                    frontier.add(child)
-                } else if (child in frontier) {
-                    if (child < frontier.elementAt(frontier.indexOf(child))) {
-                        frontier.remove(child)
-                        frontier.add(child)
-                    }
-                }
-            }
-        }
-        return null
+        return greedyBestFirstSearch(problem, f = Node::g)
     }
 
     /**
@@ -138,6 +120,10 @@ object Agent {
     }
 
 
+    /**
+     * more complete version of depthLimitedSearch
+     * preferred method when search space is large and depth of solution is unknown
+     */
     fun iterativeDeepeningSearch(problem: Problem): Node? {
         for (depth in 0..Int.MAX_VALUE) {
             val node = depthLimitedSearch(problem, depth)
@@ -244,7 +230,9 @@ object Agent {
         return Int.MAX_VALUE
     }
 
-
+    /**
+     * Bidirectional search using bfs
+     */
     @ExperimentalStdlibApi
     fun simpleBidirectionalSearch(problem: Problem): Pair<Node, Node?>? {
         val nodeI = Node(problem.initial)
@@ -278,5 +266,49 @@ object Agent {
             }
         }
         return null
+    }
+
+
+    /*------------------------------------------------------------------------------------------*/
+
+    /**
+     * expand closet to the goal
+     */
+    fun greedyBestFirstSearch(problem: Problem, f: (Node) -> Int): Node? {
+        val frontier = PriorityQueue(compareBy(f))
+        frontier.add(Node(problem.initial, pathCost = 0))
+        val explored = mutableSetOf<State>()
+        val track = mutableMapOf<Node, Int>()
+        while (frontier.isNotEmpty()) {
+            val node = frontier.poll()
+            //return at selected for expansion since node found can be in suboptimal path
+            if (problem.goalTest(node.state)) {
+                //println(track)
+                return node
+            }
+            explored.add(node.state)
+            for (child in node.expand(problem)) {
+                if (child.state !in explored && child !in frontier) {
+                    frontier.add(child)
+                    track[child] = f(child)
+                } else if (child in frontier) {
+                    if (f(child) < f(frontier.elementAt(frontier.indexOf(child)))) {
+                        frontier.remove(child)
+                        frontier.add(child)
+                        track[child] = f(child)
+                    }
+                }
+            }
+        }
+        return null
+        //val nodeGoal = Agent.greedyBestFirstSearch(problem) { problem.h(it) }
+    }
+
+
+    /**
+     * minimize the total estimated cost
+     */
+    fun aStarSearch(problem: Problem): Node? {
+        return greedyBestFirstSearch(problem, (problem as GraphProblem)::f)
     }
 }

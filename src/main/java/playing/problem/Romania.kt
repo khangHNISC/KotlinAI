@@ -65,5 +65,6 @@ fun main() {
     )
 
     val problem = GraphProblem(State("Arad"), listOf(State("Bucharest")), romaniaMap)
-    val nodeGoal = Agent.simpleBidirectionalSearch(problem)
+    val nodeGoal = Agent.aStarSearch(problem)
+    println(nodeGoal?.solution())
 }

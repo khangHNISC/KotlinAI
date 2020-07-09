@@ -23,7 +23,6 @@ Define problem
     4. Goal test
         Set { In(Bucharest) }
     5. Path cost function
-    6. States:
 
 Searching for Solutions:
     search tree, satate = node
@@ -50,3 +49,10 @@ UnInformed Search:
         _ Tree Search (not avoid redundant path) is incomplete
         _ require only O(bm) storage (m = max depth)
 
+Informed Search
+        _ f(n) evaluation function: cost estimate
+        _ h(n) heuristic function: estimate cost of cheapest path to goal from n
+
+   Greedy best-first search
+        _ expand node closest to goal f(n) = h(n)
+        _ not optimal and incomplete

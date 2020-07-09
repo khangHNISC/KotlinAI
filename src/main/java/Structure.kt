@@ -70,6 +70,10 @@ class GraphProblem(
             return locs.get(node.state)?.distance(locs[goal.first()])?.toInt() ?: Int.MAX_VALUE
         else return Int.MAX_VALUE
     }
+
+    fun f(node: Node): Int {
+        return h(node) + node.g()
+    }
 }
 
 
@@ -133,7 +137,7 @@ open class Node(
         val state: State,
         private val parent: Node? = null,
         private val action: Action? = null,
-        val pathCost: Int = 0
+        private val pathCost: Int = 0
 ) : Comparable<Node> {
     private var depth: Int = 0
 
@@ -180,6 +184,8 @@ open class Node(
             it.action!!
         }
     }
+
+    fun g(): Int = pathCost
 
     override fun equals(other: Any?): Boolean {
         return other is Node && state == other.state
