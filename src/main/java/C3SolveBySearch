@@ -56,3 +56,18 @@ Informed Search
    Greedy best-first search
         _ expand node closest to goal f(n) = h(n)
         _ not optimal and incomplete
+
+   A*
+        _ f(n) = g(n) + h(n)
+        _ condition for optimal:
+            h never overestimate the cost (admissible)
+            h need to be consistent h(n) <= c(n, a, n') + h(n') triangle inequality
+                consistent is stricter than admissible
+            => f(n') = g(n') + h(n') = g(n) + c(n, a, n') + h(n') >= g(n) + h(n) = f(n)
+            => When A* select a node n for expansion, the optimnal path to that node has been found
+        _ optimally efficient
+            subTree that costs more than goal is pruned. (expand f(n) < C*)
+        _ complete
+        _ absolute error = h* - h (h* = actual cost of getting from root to goal)
+        - relative error = (h* -h)/h*
+

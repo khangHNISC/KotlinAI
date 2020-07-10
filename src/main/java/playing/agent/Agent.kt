@@ -141,7 +141,6 @@ object Agent {
         //g value f value
         //h = heuristic function
         //pr = priority of node = max (f(n), 2 g(n))
-
         var e = 0
         if (problem is GraphProblem) e = problem.findMinEdge()
         var (gF, gB) = Pair(mutableMapOf(Node(problem.initial) to 0), mutableMapOf(Node(problem.goal.first()) to 0))
@@ -270,9 +269,8 @@ object Agent {
 
 
     /*------------------------------------------------------------------------------------------*/
-
     /**
-     * expand closet to the goal
+     * expand closet to the goal base on evaluation function
      */
     fun greedyBestFirstSearch(problem: Problem, f: (Node) -> Int): Node? {
         val frontier = PriorityQueue(compareBy(f))
@@ -283,7 +281,6 @@ object Agent {
             val node = frontier.poll()
             //return at selected for expansion since node found can be in suboptimal path
             if (problem.goalTest(node.state)) {
-                //println(track)
                 return node
             }
             explored.add(node.state)
@@ -310,5 +307,28 @@ object Agent {
      */
     fun aStarSearch(problem: Problem): Node? {
         return greedyBestFirstSearch(problem, (problem as GraphProblem)::f)
+    }
+
+
+    /**
+     *
+     */
+    fun iterativeDeepeningAStar(problem: Problem): Node? {
+]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 fun IDARec(problem: Problem, node: Node, threshold: Int): Node? {
+            when {
+                problem.goalTest(node.state) -> return node
+                (problem as GraphProblem).f(node) > threshold -> {
+                    val nodeCutOff = NodeCutOff()
+                    nodeCutOff.bound = problem.f(node)
+                    return nodeCutOff
+                }
+                else -> {
+                    for (child in node.expand(problem)) {
+                        val result = IDARec(problem, child, threshold)
+                    }
+                }
+            }
+            return null
+        }
     }
 }

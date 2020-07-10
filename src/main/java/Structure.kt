@@ -64,6 +64,11 @@ class GraphProblem(
         return m
     }
 
+    /**
+     * !   !
+     * !---!
+     * !   !SLD = straight-line distance
+     */
     fun h(node: Node): Int {
         val locs = graph.location
         if (locs != null)
@@ -205,4 +210,6 @@ open class Node(
 }
 
 
-class NodeCutOff : Node(State(""))
+class NodeCutOff : Node(State("")){
+    var bound: Int = 0
+}
