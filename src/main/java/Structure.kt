@@ -145,6 +145,7 @@ open class Node(
         private val pathCost: Int = 0
 ) : Comparable<Node> {
     private var depth: Int = 0
+    var fValue: Int = 0
 
     init {
         if (parent != null) depth += 1
@@ -180,7 +181,7 @@ open class Node(
         return pathBack.asReversed()
     }
 
-    /**
+    /*
      *  list of actions from root to this node
      */
     fun solution(): List<Action> {
@@ -210,6 +211,6 @@ open class Node(
 }
 
 
-class NodeCutOff : Node(State("")){
-    var bound: Int = 0
+class NodeCutOff : Node(State("")) {
+    var bound: Int = Int.MAX_VALUE
 }

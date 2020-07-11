@@ -65,6 +65,6 @@ fun main() {
     )
 
     val problem = GraphProblem(State("Arad"), listOf(State("Bucharest")), romaniaMap)
-    val nodeGoal = Agent.aStarSearch(problem)
+    val nodeGoal = Agent.recursiveBestFirstSearch(problem, problem::f)
     println(nodeGoal?.solution())
 }

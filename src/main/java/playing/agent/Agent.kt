@@ -108,6 +108,7 @@ object Agent {
                 else -> {
                     var cutoffOccurred = false
                     for (child in node.expand(problem)) {
+                        // discover like bfs
                         val result = recursiveDLS(child, problem, limit - 1)
                         if (result is NodeCutOff) cutoffOccurred = true
                         else if (result != null) return result //post order
@@ -134,6 +135,12 @@ object Agent {
         return null
     }
 
+    /**
+     *
+     */
+    fun iterativeLengtheningSearch(){
+
+    }
 
     fun bidirectionalSearch(problem: Problem): Int {
         //open list forward backward
@@ -309,26 +316,32 @@ object Agent {
         return greedyBestFirstSearch(problem, (problem as GraphProblem)::f)
     }
 
-
     /**
-     *
+     * RBFS
      */
-    fun iterativeDeepeningAStar(problem: Problem): Node? {
-]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 fun IDARec(problem: Problem, node: Node, threshold: Int): Node? {
-            when {
-                problem.goalTest(node.state) -> return node
-                (problem as GraphProblem).f(node) > threshold -> {
-                    val nodeCutOff = NodeCutOff()
-                    nodeCutOff.bound = problem.f(node)
-                    return nodeCutOff
-                }
-                else -> {
-                    for (child in node.expand(problem)) {
-                        val result = IDARec(problem, child, threshold)
-                    }
-                }
+    fun recursiveBestFirstSearch(problem: Problem, f: (Node) -> Int): Node? {
+
+        fun RBFS(problem: Problem, node: Node, threshold: Int): Pair<Node?, Int> {
+            if (problem.goalTest(node.state)) return Pair(node, 0)
+            var children = node.expand(problem)
+            if (children.isEmpty()) return Pair(null, Int.MAX_VALUE)
+            for (s in children) {
+                s.fValue = max(f(s), node.fValue)
             }
-            return null
+            while (true) {
+                children = children.sortedBy { it.fValue }
+                val best = children.first()
+                if (best.fValue > threshold) return Pair(null, best.fValue)
+                val alternative = if (children.size > 1) children[1].fValue else Int.MAX_VALUE
+                val pairResult = RBFS(problem, best, min(threshold, alternative))
+                val result = pairResult.first
+                best.fValue = pairResult.second
+                if (result != null) return Pair(result, best.fValue)
+            }
         }
+
+        val node = Node(problem.initial)
+        node.fValue = f(node)
+        return RBFS(problem, node, Int.MAX_VALUE).first
     }
 }
