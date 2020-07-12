@@ -1,6 +1,7 @@
 package playing.problem
 
 import GraphProblem
+import Node
 import State
 import UndirectedGraph
 import playing.agent.Agent
@@ -65,6 +66,6 @@ fun main() {
     )
 
     val problem = GraphProblem(State("Arad"), listOf(State("Bucharest")), romaniaMap)
-    val nodeGoal = Agent.recursiveBestFirstSearch(problem, problem::f)
+    val nodeGoal = Agent.ILS(problem, problem.f(Node(problem.initial)))
     println(nodeGoal?.solution())
 }

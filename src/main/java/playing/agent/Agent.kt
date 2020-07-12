@@ -68,13 +68,6 @@ object Agent {
         return null
     }
 
-    /*
-     * Uniform-cost search
-     */
-    @ExperimentalStdlibApi
-    fun uniformCostSearch(problem: Problem): Node? {
-        return greedyBestFirstSearch(problem, f = Node::g)
-    }
 
     /**
      * dfs - graph search
@@ -97,27 +90,12 @@ object Agent {
     }
 
 
-    /**
-     * dfs limited level
-     */
-    private fun depthLimitedSearch(problem: Problem, limit: Int = 5): Node? {
-        fun recursiveDLS(node: Node, problem: Problem, limit: Int): Node? {
-            when {
-                problem.goalTest(node.state) -> return node
-                limit == 0 -> return NodeCutOff()
-                else -> {
-                    var cutoffOccurred = false
-                    for (child in node.expand(problem)) {
-                        // discover like bfs
-                        val result = recursiveDLS(child, problem, limit - 1)
-                        if (result is NodeCutOff) cutoffOccurred = true
-                        else if (result != null) return result //post order
-                    }
-                    return if (cutoffOccurred) NodeCutOff() else null
-                }
-            }
-        }
-        return recursiveDLS(Node(problem.initial), problem, limit)
+    /*
+    * Uniform-cost search
+    */
+    @ExperimentalStdlibApi
+    fun uniformCostSearch(problem: Problem): Node? {
+        return greedyBestFirstSearch(problem, f = Node::g)
     }
 
 
@@ -125,7 +103,30 @@ object Agent {
      * more complete version of depthLimitedSearch
      * preferred method when search space is large and depth of solution is unknown
      */
-    fun iterativeDeepeningSearch(problem: Problem): Node? {
+    fun IDS(problem: Problem): Node? {
+        /**
+         * dfs limited level
+         */
+        fun depthLimitedSearch(problem: Problem, limit: Int = 5): Node? {
+            fun recursiveDLS(node: Node, problem: Problem, limit: Int): Node? {
+                when {
+                    problem.goalTest(node.state) -> return node
+                    limit == 0 -> return NodeCutOff()
+                    else -> {
+                        var cutoffOccurred = false
+                        for (child in node.expand(problem)) {
+                            // discover like bfs
+                            val result = recursiveDLS(child, problem, limit - 1)
+                            if (result is NodeCutOff) cutoffOccurred = true
+                            else if (result != null) return result //post order
+                        }
+                        return if (cutoffOccurred) NodeCutOff() else null
+                    }
+                }
+            }
+            return recursiveDLS(Node(problem.initial), problem, limit)
+        }
+
         for (depth in 0..Int.MAX_VALUE) {
             val node = depthLimitedSearch(problem, depth)
             if (node != NodeCutOff()) {
@@ -138,9 +139,34 @@ object Agent {
     /**
      *
      */
-    fun iterativeLengtheningSearch(){
+    fun ILS(problem: Problem, limit: Int): Node? {
+        fun recursiveCLS(node: Node, problem: Problem, limit: Int): Pair<Node?, Int> {
+            when {
+                problem.goalTest(node.state) -> return Pair(node, 0)
+                node.g() > limit -> return Pair(NodeCutOff(), node.g())
+                else -> {
+                    var (nodeDiscarded, localMinDiscarded) = Pair<Node?, Int>(null, Int.MAX_VALUE)
+                    for (child in node.expand(problem)) {
+                        val result = recursiveCLS(child, problem, limit)
+                        if (result.first is NodeCutOff && localMinDiscarded > result.second) {
+                            nodeDiscarded = result.first
+                            localMinDiscarded = result.second
+                        } else if (result.first != null) return result
+                    }
+                    return Pair(nodeDiscarded, localMinDiscarded)
+                }
+            }
+        }
 
+        var threshold = 0
+        while (true) {
+            println(threshold)
+            val node = recursiveCLS(Node(problem.initial), problem, threshold)
+            if (node.first != null && node.first !is NodeCutOff) return node.first
+            threshold = node.second
+        }
     }
+
 
     fun bidirectionalSearch(problem: Problem): Int {
         //open list forward backward
@@ -279,7 +305,7 @@ object Agent {
     /**
      * expand closet to the goal base on evaluation function
      */
-    fun greedyBestFirstSearch(problem: Problem, f: (Node) -> Int): Node? {
+    private fun greedyBestFirstSearch(problem: Problem, f: (Node) -> Int): Node? {
         val frontier = PriorityQueue(compareBy(f))
         frontier.add(Node(problem.initial, pathCost = 0))
         val explored = mutableSetOf<State>()
@@ -321,7 +347,7 @@ object Agent {
      */
     fun recursiveBestFirstSearch(problem: Problem, f: (Node) -> Int): Node? {
 
-        fun RBFS(problem: Problem, node: Node, threshold: Int): Pair<Node?, Int> {
+        fun rBFS(problem: Problem, node: Node, threshold: Int): Pair<Node?, Int> {
             if (problem.goalTest(node.state)) return Pair(node, 0)
             var children = node.expand(problem)
             if (children.isEmpty()) return Pair(null, Int.MAX_VALUE)
@@ -333,7 +359,7 @@ object Agent {
                 val best = children.first()
                 if (best.fValue > threshold) return Pair(null, best.fValue)
                 val alternative = if (children.size > 1) children[1].fValue else Int.MAX_VALUE
-                val pairResult = RBFS(problem, best, min(threshold, alternative))
+                val pairResult = rBFS(problem, best, min(threshold, alternative))
                 val result = pairResult.first
                 best.fValue = pairResult.second
                 if (result != null) return Pair(result, best.fValue)
@@ -342,6 +368,6 @@ object Agent {
 
         val node = Node(problem.initial)
         node.fValue = f(node)
-        return RBFS(problem, node, Int.MAX_VALUE).first
+        return rBFS(problem, node, Int.MAX_VALUE).first
     }
 }

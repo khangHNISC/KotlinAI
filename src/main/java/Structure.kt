@@ -211,6 +211,4 @@ open class Node(
 }
 
 
-class NodeCutOff : Node(State("")) {
-    var bound: Int = Int.MAX_VALUE
-}
+class NodeCutOff : Node(State(""))
