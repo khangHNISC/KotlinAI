@@ -65,7 +65,8 @@ fun main() {
             State("Vaslui") to Point(509, 444), State("Zerind") to Point(108, 531)
     )
 
-    val problem = GraphProblem(State("Arad"), listOf(State("Bucharest")), romaniaMap)
-    val nodeGoal = Agent.ILS(problem, problem.f(Node(problem.initial)))
+    val problemF = GraphProblem(State("Arad"), listOf(State("Bucharest")), romaniaMap)
+    val problemB = GraphProblem(State("Bucharest"), listOf(State("Arad")), romaniaMap)
+    val nodeGoal = Agent.simpleBidirectionalSearch(problemF, Node::g, problemB, Node::g)
     println(nodeGoal?.solution())
 }

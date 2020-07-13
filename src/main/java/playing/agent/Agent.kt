@@ -15,6 +15,10 @@ object Agent {
 
     /**
      * BFS - tree search
+     * Complete? only if branching b is finite
+     * Time O(b^d)
+     * Space O(b^d)
+     * Optimal? if step costs are identical
      */
     @ExperimentalStdlibApi
     fun bfsTree(problem: Problem): Node? {
@@ -32,6 +36,10 @@ object Agent {
 
     /**
      * DFS tree search
+     * Complete? No because loop
+     * Time 0(b^m)
+     * Space 0(bm)
+     * Optimal No
      */
     @ExperimentalStdlibApi
     fun dfsTree(problem: Problem): Node? {
@@ -92,6 +100,10 @@ object Agent {
 
     /*
     * Uniform-cost search
+    * Complete if b is finite and step costs >= e for positive e
+    * Time O(b^(1+[C*:e])
+    * Space O(b^(1+[C*:e])
+    * Optimal yes
     */
     @ExperimentalStdlibApi
     fun uniformCostSearch(problem: Problem): Node? {
@@ -104,9 +116,6 @@ object Agent {
      * preferred method when search space is large and depth of solution is unknown
      */
     fun IDS(problem: Problem): Node? {
-        /**
-         * dfs limited level
-         */
         fun depthLimitedSearch(problem: Problem, limit: Int = 5): Node? {
             fun recursiveDLS(node: Node, problem: Problem, limit: Int): Node? {
                 when {
@@ -115,7 +124,6 @@ object Agent {
                     else -> {
                         var cutoffOccurred = false
                         for (child in node.expand(problem)) {
-                            // discover like bfs
                             val result = recursiveDLS(child, problem, limit - 1)
                             if (result is NodeCutOff) cutoffOccurred = true
                             else if (result != null) return result //post order
@@ -136,21 +144,24 @@ object Agent {
         return null
     }
 
+
     /**
-     *
+     * more general of IDS
      */
-    fun ILS(problem: Problem, limit: Int): Node? {
-        fun recursiveCLS(node: Node, problem: Problem, limit: Int): Pair<Node?, Int> {
+    fun ILS(problem: Problem): Node? {
+        fun recursiveILS(node: Node, problem: Problem, limit: Int): Pair<Node?, Int> {
             when {
                 problem.goalTest(node.state) -> return Pair(node, 0)
-                node.g() > limit -> return Pair(NodeCutOff(), node.g())
+                node.g() > limit -> return Pair(NodeCutOff(node.state), node.g())
                 else -> {
                     var (nodeDiscarded, localMinDiscarded) = Pair<Node?, Int>(null, Int.MAX_VALUE)
                     for (child in node.expand(problem)) {
-                        val result = recursiveCLS(child, problem, limit)
-                        if (result.first is NodeCutOff && localMinDiscarded > result.second) {
-                            nodeDiscarded = result.first
-                            localMinDiscarded = result.second
+                        val result = recursiveILS(child, problem, limit)
+                        if (result.first is NodeCutOff) {
+                            if (localMinDiscarded > result.second) {
+                                nodeDiscarded = result.first
+                                localMinDiscarded = result.second
+                            }
                         } else if (result.first != null) return result
                     }
                     return Pair(nodeDiscarded, localMinDiscarded)
@@ -160,10 +171,10 @@ object Agent {
 
         var threshold = 0
         while (true) {
-            println(threshold)
-            val node = recursiveCLS(Node(problem.initial), problem, threshold)
+            val node = recursiveILS(Node(problem.initial), problem, threshold)
             if (node.first != null && node.first !is NodeCutOff) return node.first
             threshold = node.second
+            println(node)
         }
     }
 
@@ -262,48 +273,99 @@ object Agent {
         return Int.MAX_VALUE
     }
 
+
     /**
      * Bidirectional search using bfs
      */
     @ExperimentalStdlibApi
-    fun simpleBidirectionalSearch(problem: Problem): Pair<Node, Node?>? {
-        val nodeI = Node(problem.initial)
-        val nodeG = Node(problem.goal.first())
-        val openF = ArrayDeque(listOf(nodeI))
-        val openB = ArrayDeque(listOf(nodeG))
-        val closed = mutableSetOf<State>()
+    fun simpleBidirectionalSearch(problemF: Problem, fF: (Node) -> Int, problemB: Problem, fB: (Node) -> Int): Node? {
+        val nodeF = Node(problemF.initial)
+        val nodeB = Node(problemB.initial)
+        val frontierF = PriorityQueue(compareBy(fF))
+        val frontierB = PriorityQueue(compareBy(fB))
+        val reachedF = mutableMapOf(nodeF.state to nodeF)
+        val reachedB = mutableMapOf(nodeB.state to nodeB)
+        frontierF.add(nodeF)
+        frontierB.add(nodeB)
+        var solution: Node? = null
 
-        while (openF.isNotEmpty() && openB.isNotEmpty()) {
-            if (openF.isNotEmpty()) {
-                val nodeF = openF.removeFirst()
-                closed.add(nodeF.state)
-                if (nodeF == nodeG) return Pair(nodeF, null)
-                if (nodeF in openB) return Pair(nodeF, openB[openB.indexOf(nodeF)])
-                for (child in nodeF.expand(problem)) {
-                    if (child.state !in closed && child !in openF) {
-                        openF.addLast(child)
+        fun proceed(
+                isFdirect: Boolean,
+                problem: Problem,
+                frontier: PriorityQueue<Node>,
+                reached: MutableMap<State, Node>,
+                reached2: MutableMap<State, Node>,
+                solution: Node?
+        ): Node? {
+            fun joinNodes(isFdirect: Boolean, nodeA: Node, nodeB: Node): Node? {
+                fun join2Node(startNode: Node, endNode: Node): Node? {
+                    var travelNode: Node? = endNode
+                    var nodeResult = startNode
+                    while (travelNode != null) {
+                        if (travelNode != nodeResult) {
+                            val temp = travelNode.parent
+                            travelNode.parent = nodeResult
+                            nodeResult = travelNode
+                            travelNode = temp
+                        }else{
+                            travelNode = travelNode.parent
+                        }
+                    }
+                    return nodeResult
+                }
+                return if (isFdirect) join2Node(nodeA, nodeB) else join2Node(nodeB, nodeA)
+            }
+
+            var refSolution = solution
+            val node = frontier.poll()
+            for (child in node.expand(problem)) {
+                val s = child.state
+                if (s !in reached || child.g() < reached[s]!!.g()) {
+                    reached[s] = child
+                    frontier.add(child)
+                    if (s in reached2) {
+                        val solution2 = joinNodes(isFdirect, child, reached2[s]!!)
+                        if (solution2?.g() ?: 0 < solution?.g() ?: Int.MAX_VALUE) {
+                            refSolution = solution2
+                        }
                     }
                 }
             }
-            if (openB.isNotEmpty()) {
-                val nodeB = openB.removeFirst()
-                closed.add(nodeB.state)
-                if (nodeB == nodeI) return Pair(nodeB, null)
-                if (nodeB in openF) return Pair(nodeB, openF[openF.indexOf(nodeB)])
-                for (child in nodeB.expand(problem)) {
-                    if (child.state !in closed && child !in openB) {
-                        openB.addLast(child)
-                    }
-                }
-            }
+            return refSolution
         }
-        return null
+
+        fun terminated(frontierF: PriorityQueue<Node>, frontierB: PriorityQueue<Node>): Boolean {
+            return frontierF.isEmpty() || frontierB.isEmpty()
+        }
+
+        while (!terminated(frontierF, frontierB)) {
+            if (fF(frontierF.peek()) < fB(frontierB.peek()))
+                solution = proceed(
+                        isFdirect = true,
+                        problem = problemF,
+                        frontier = frontierF,
+                        reached = reachedF,
+                        reached2 = reachedB,
+                        solution = solution
+                )
+            else
+                solution = proceed(
+                        isFdirect = false,
+                        problem = problemB,
+                        frontier = frontierB,
+                        reached = reachedB,
+                        reached2 = reachedF,
+                        solution = solution
+                )
+        }
+        return solution
     }
 
 
     /*------------------------------------------------------------------------------------------*/
     /**
      * expand closet to the goal base on evaluation function
+     * guide or limited by path cost
      */
     private fun greedyBestFirstSearch(problem: Problem, f: (Node) -> Int): Node? {
         val frontier = PriorityQueue(compareBy(f))

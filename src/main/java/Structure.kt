@@ -140,7 +140,7 @@ class UndirectedGraph(
 
 open class Node(
         val state: State,
-        private val parent: Node? = null,
+        var parent: Node? = null,
         private val action: Action? = null,
         private val pathCost: Int = 0
 ) : Comparable<Node> {
@@ -211,4 +211,4 @@ open class Node(
 }
 
 
-class NodeCutOff : Node(State(""))
+class NodeCutOff(state: State = State("")) : Node(state)
