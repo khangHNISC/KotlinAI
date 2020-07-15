@@ -1,17 +1,16 @@
 import java.awt.Point
-import java.util.Collections.min
 
-class State(val stateName: String) {
+class State(val state: Any) {
     override fun equals(other: Any?): Boolean {
-        return other is State && stateName == other.stateName
+        return other is State && state == other.state
     }
 
     override fun hashCode(): Int {
-        return stateName.hashCode()
+        return state.hashCode()
     }
 
     override fun toString(): String {
-        return "State(stateName='$stateName')"
+        return "State(statePresent='$state')"
     }
 }
 
@@ -21,7 +20,7 @@ class Action(val destState: State, private val cost: Int) {
     }
 }
 
-abstract class Problem(open val initial: State, open val goal: List<State>) {
+abstract class Problem(open val initial: State, open val goal: List<State>? = null) {
 
     //get all list actions out of state
     abstract fun actions(state: State): List<Action>
@@ -30,55 +29,10 @@ abstract class Problem(open val initial: State, open val goal: List<State>) {
     abstract fun result(state: State, action: Action): State
 
     //is this goal
-    fun goalTest(state: State): Boolean = goal.contains(state)
+    open fun goalTest(state: State): Boolean = goal?.contains(state) ?: false
 
     //total cost to 2
     abstract fun pathCost(costSoFar: Int, state1: State, action: Action?, state2: State): Int
-}
-
-
-class GraphProblem(
-        override val initial: State,
-        override val goal: List<State>,
-        private val graph: Graph //delegation
-) : Problem(initial, goal) {
-
-    override fun actions(state: State): List<Action> {
-        return graph.get(state)
-    }
-
-    override fun result(state: State, action: Action): State {
-        return graph.getDestState(action)
-    }
-
-    override fun pathCost(costSoFar: Int, state1: State, action: Action?, state2: State): Int {
-        return costSoFar + graph.getCost(state1, state2)
-    }
-
-    fun findMinEdge(): Int {
-        var m = Integer.MAX_VALUE
-        for (action in graph.graphDict.values) {
-            val localMin = min(action.values)
-            m = Math.min(localMin, m)
-        }
-        return m
-    }
-
-    /**
-     * !   !
-     * !---!
-     * !   !SLD = straight-line distance
-     */
-    fun h(node: Node): Int {
-        val locs = graph.location
-        if (locs != null)
-            return locs.get(node.state)?.distance(locs[goal.first()])?.toInt() ?: Int.MAX_VALUE
-        else return Int.MAX_VALUE
-    }
-
-    fun f(node: Node): Int {
-        return h(node) + node.g()
-    }
 }
 
 
@@ -202,7 +156,7 @@ open class Node(
     }
 
     override fun toString(): String {
-        return "Node(state=${state.stateName})"
+        return "Node(state=${state.state})"
     }
 
     override fun compareTo(other: Node): Int {

@@ -1,11 +1,11 @@
 package playing.agent
 
-import GraphProblem
 import Node
 import NodeCutOff
 import Problem
 import Quadruple
 import State
+import playing.problem.GraphProblem
 import java.util.*
 import kotlin.collections.ArrayDeque
 import kotlin.math.max
@@ -365,7 +365,7 @@ object Agent {
     /*------------------------------------------------------------------------------------------*/
     /**
      * expand closet to the goal base on evaluation function
-     * guide or limited by path cost
+     * greedy bfs = how close a node to a solution
      */
     private fun greedyBestFirstSearch(problem: Problem, f: (Node) -> Int): Node? {
         val frontier = PriorityQueue(compareBy(f))
@@ -433,3 +433,7 @@ object Agent {
         return rBFS(problem, node, Int.MAX_VALUE).first
     }
 }
+/**
+ *  uninformed search bfs, dfs, bidirectional bfs, IDS
+ *  informed bestfirst - Dijkstra, A*, IDA*, SMA*
+ **/

@@ -1,6 +1,5 @@
 package playing.problem
 
-import GraphProblem
 import Node
 import State
 import UndirectedGraph
@@ -65,8 +64,12 @@ fun main() {
             State("Vaslui") to Point(509, 444), State("Zerind") to Point(108, 531)
     )
 
-    val problemF = GraphProblem(State("Arad"), listOf(State("Bucharest")), romaniaMap)
+    /*val problemF = GraphProblem(State("Arad"), listOf(State("Bucharest")), romaniaMap)
     val problemB = GraphProblem(State("Bucharest"), listOf(State("Arad")), romaniaMap)
     val nodeGoal = Agent.simpleBidirectionalSearch(problemF, Node::g, problemB, Node::g)
-    println(nodeGoal?.solution())
+    println(nodeGoal?.solution())*/
+
+
+    val initQueenState = State(IntArray(8).fill(-1, 0, 8))
+    //val p = NQueensProblem();
 }
