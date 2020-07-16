@@ -1,6 +1,6 @@
 import java.awt.Point
 
-class State(val state: Any) {
+open class State(open val state: Any) {
     override fun equals(other: Any?): Boolean {
         return other is State && state == other.state
     }
@@ -10,9 +10,10 @@ class State(val state: Any) {
     }
 
     override fun toString(): String {
-        return "State(statePresent='$state')"
+        return "State(statePresent='${state}')"
     }
 }
+
 
 class Action(val destState: State, private val cost: Int) {
     override fun toString(): String {
@@ -20,7 +21,7 @@ class Action(val destState: State, private val cost: Int) {
     }
 }
 
-abstract class Problem(open val initial: State, open val goal: List<State>? = null) {
+abstract class Problem(open val initial: State, open val goal: List<State>) {
 
     //get all list actions out of state
     abstract fun actions(state: State): List<Action>
@@ -29,7 +30,7 @@ abstract class Problem(open val initial: State, open val goal: List<State>? = nu
     abstract fun result(state: State, action: Action): State
 
     //is this goal
-    open fun goalTest(state: State): Boolean = goal?.contains(state) ?: false
+    open fun goalTest(state: State): Boolean = goal.contains(state) ?: false
 
     //total cost to 2
     abstract fun pathCost(costSoFar: Int, state1: State, action: Action?, state2: State): Int
