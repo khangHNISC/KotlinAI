@@ -34,6 +34,8 @@ abstract class Problem(open val initial: State, open val goal: List<State>) {
 
     //total cost to 2
     abstract fun pathCost(costSoFar: Int, state1: State, action: Action?, state2: State): Int
+
+    open fun value(state: State) = 0
 }
 
 

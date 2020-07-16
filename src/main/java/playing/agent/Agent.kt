@@ -307,7 +307,7 @@ object Agent {
                             travelNode.parent = nodeResult
                             nodeResult = travelNode
                             travelNode = temp
-                        }else{
+                        } else {
                             travelNode = travelNode.parent
                         }
                     }
@@ -432,7 +432,22 @@ object Agent {
         node.fValue = f(node)
         return rBFS(problem, node, Int.MAX_VALUE).first
     }
+
+
+    /*------------------------------------------------------------------------------------------*/
+    fun hillClimbing(problem: Problem): Node? {
+        var current = Node(problem.initial)
+        while (true) {
+            val neighbors = current.expand(problem)
+            if (neighbors.isEmpty()) break
+            val neighbor = Collections.max(neighbors, compareBy { problem.value(it.state) })
+            if (problem.value(neighbor.state) <= problem.value(current.state)) break
+            current = neighbor
+        }
+        return current
+    }
 }
+
 /**
  *  uninformed search bfs, dfs, bidirectional bfs, IDS
  *  informed bestfirst - Dijkstra, A*, IDA*, SMA*

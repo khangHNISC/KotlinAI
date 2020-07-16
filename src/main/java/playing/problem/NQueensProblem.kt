@@ -3,6 +3,7 @@ package playing.problem
 import Action
 import Problem
 import State
+import playing.agent.Agent
 
 /**
  * state is represented as N-element array
@@ -28,15 +29,14 @@ class NQueensProblem(
         }
     }
 
-    override fun pathCost(costSoFar: Int, state1: State, action: Action?, state2: State): Int {
-        TODO("Not yet implemented")
-    }
+    override fun pathCost(costSoFar: Int, state1: State, action: Action?, state2: State): Int = 0
 
     override fun result(state: State, action: Action): State {
         return action.destState
     }
 
     private fun conflict(row1: Int, col1: Int, row2: Int, col2: Int): Boolean {
+        if(row1 == -1 || row2 == -1) return false
         return row1 == row2
                 || col1 == col2
                 || row1 - col1 == row2 - col2
@@ -46,32 +46,47 @@ class NQueensProblem(
     private fun conflicted(state: State, row: Int, col: Int): Boolean {
         //only check from leftmost to col - 1
         val ar = state.state as IntArray
-        for (c in 0..col) {
+        for (c in 0 until col) {
             if (conflict(row, col, ar[c], c)) {
-                return false
+                return true
             }
         }
-        return true
+        return false
     }
 
     override fun goalTest(state: State): Boolean {
         val ar = state.state as IntArray
         if (ar.contains(-1)) return false
-        for (col in 0..boardSize) {
+        for (col in 0 until boardSize) {
             if (conflicted(state, ar[col], col)) {
                 return false
             }
         }
         return true
     }
+
+    fun h(state: State): Int {
+        //"""Return number of conflicting queens for a given node"""
+        var numConflicts = 0
+        val ar = state.state as IntArray
+        for (i in 0 until boardSize - 1) {
+            for (j in i + 1 until boardSize) {
+                if (conflict(ar[i], i, ar[j], j)) {
+                    numConflicts += 1
+                }
+            }
+        }
+        return numConflicts
+    }
 }
 
 
+@ExperimentalStdlibApi
 fun main() {
     val initList = IntArray(8)
     initList.fill(-1, 0, 8)
     val initQueenState = State(initList)
-    val p = NQueensProblem(initQueenState, 8)
-    println(p.actions(initQueenState))
-
+    val problem = NQueensProblem(initQueenState, 8)
+    val sol = Agent.bfs(problem)
+    println(sol?.solution())
 }
