@@ -12,7 +12,6 @@ import kotlin.math.max
 import kotlin.math.min
 
 object Agent {
-
     /**
      * BFS - tree search
      * Complete? only if branching b is finite
@@ -53,6 +52,7 @@ object Agent {
         }
         return null
     }
+
 
     /**
      * BFS - graph search
@@ -334,6 +334,7 @@ object Agent {
             return refSolution
         }
 
+
         fun terminated(frontierF: PriorityQueue<Node>, frontierB: PriorityQueue<Node>): Boolean {
             return frontierF.isEmpty() || frontierB.isEmpty()
         }
@@ -404,6 +405,7 @@ object Agent {
         return greedyBestFirstSearch(problem, (problem as GraphProblem)::f)
     }
 
+
     /**
      * RBFS
      */
@@ -449,6 +451,7 @@ object Agent {
 }
 
 /**
+ *
  *  uninformed search bfs, dfs, bidirectional bfs, IDS
  *  informed bestfirst - Dijkstra, A*, IDA*, SMA*
  **/

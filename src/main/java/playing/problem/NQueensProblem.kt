@@ -21,9 +21,10 @@ class NQueensProblem(
             val col = ar.indexOf(-1)
             val possibleMove = IntArray(boardSize) { it }
                     .filter { row -> !conflicted(state, row, col) }
-            possibleMove.foldRight(mutableListOf()) { row, initList ->
-                ar[col] = row
-                initList.add(Action(State(ar), 0))
+            return possibleMove.foldRight(mutableListOf()) { row, initList ->
+                val newAr = ar.copyOf()
+                newAr[col] = row
+                initList.add(Action(State(newAr), 0))
                 initList
             }
         }
@@ -36,7 +37,7 @@ class NQueensProblem(
     }
 
     private fun conflict(row1: Int, col1: Int, row2: Int, col2: Int): Boolean {
-        if(row1 == -1 || row2 == -1) return false
+        if (row1 == -1 || row2 == -1) return false
         return row1 == row2
                 || col1 == col2
                 || row1 - col1 == row2 - col2
@@ -69,15 +70,22 @@ class NQueensProblem(
         //"""Return number of conflicting queens for a given node"""
         var numConflicts = 0
         val ar = state.state as IntArray
-        for (i in 0 until boardSize - 1) {
-            for (j in i + 1 until boardSize) {
-                if (conflict(ar[i], i, ar[j], j)) {
-                    numConflicts += 1
+        for (i in 0 until boardSize) {
+            if (ar[i] == -1) numConflicts += 1
+            else {
+                if (i == boardSize - 1) break
+                for (j in i + 1 until boardSize) {
+                    if (conflict(ar[i], i, ar[j], j)) {
+                        numConflicts += 1
+                    }
                 }
             }
         }
         return numConflicts
     }
+
+
+    override fun value(state: State): Int = -h(state)
 }
 
 
@@ -87,6 +95,6 @@ fun main() {
     initList.fill(-1, 0, 8)
     val initQueenState = State(initList)
     val problem = NQueensProblem(initQueenState, 8)
-    val sol = Agent.bfs(problem)
-    println(sol?.solution())
+    val sol = Agent.hillClimbing(problem)
+    println(sol?.solution()?.map { (it.destState.state as IntArray).toList() })
 }

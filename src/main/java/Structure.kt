@@ -21,6 +21,7 @@ class Action(val destState: State, private val cost: Int) {
     }
 }
 
+
 abstract class Problem(open val initial: State, open val goal: List<State>) {
 
     //get all list actions out of state
