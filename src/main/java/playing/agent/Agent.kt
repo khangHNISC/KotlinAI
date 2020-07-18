@@ -290,15 +290,16 @@ object Agent {
         var solution: Node? = null
 
         fun proceed(
-                isFdirect: Boolean,
+                isF: Boolean,
                 problem: Problem,
                 frontier: PriorityQueue<Node>,
                 reached: MutableMap<State, Node>,
                 reached2: MutableMap<State, Node>,
                 solution: Node?
         ): Node? {
-            fun joinNodes(isFdirect: Boolean, nodeA: Node, nodeB: Node): Node? {
+            fun joinNodes(isF: Boolean, nodeA: Node, nodeB: Node): Node? {
                 fun join2Node(startNode: Node, endNode: Node): Node? {
+                    //B f s a
                     var travelNode: Node? = endNode
                     var nodeResult = startNode
                     while (travelNode != null) {
@@ -313,7 +314,7 @@ object Agent {
                     }
                     return nodeResult
                 }
-                return if (isFdirect) join2Node(nodeA, nodeB) else join2Node(nodeB, nodeA)
+                return if (isF) join2Node(nodeA, nodeB) else join2Node(nodeB, nodeA)
             }
 
             var refSolution = solution
@@ -321,12 +322,14 @@ object Agent {
             for (child in node.expand(problem)) {
                 val s = child.state
                 if (s !in reached || child.g() < reached[s]!!.g()) {
+                    //if not in reached or in reached but found better
                     reached[s] = child
                     frontier.add(child)
                     if (s in reached2) {
-                        val solution2 = joinNodes(isFdirect, child, reached2[s]!!)
-                        if (solution2?.g() ?: 0 < solution?.g() ?: Int.MAX_VALUE) {
-                            refSolution = solution2
+                        //some how reached2[s] = R -> B -> P -> F
+                        val localSolution = joinNodes(isF, child, reached2[s]!!)
+                        if (localSolution?.g()!! < solution?.g() ?: Int.MAX_VALUE) {
+                            refSolution = localSolution
                         }
                     }
                 }
@@ -335,14 +338,15 @@ object Agent {
         }
 
 
-        fun terminated(frontierF: PriorityQueue<Node>, frontierB: PriorityQueue<Node>): Boolean {
+        fun terminated(solution: Node?, frontierF: PriorityQueue<Node>, frontierB: PriorityQueue<Node>): Boolean {
+            if (solution != null) return true
             return frontierF.isEmpty() || frontierB.isEmpty()
         }
 
-        while (!terminated(frontierF, frontierB)) {
+        while (!terminated(solution, frontierF, frontierB)) {
             if (fF(frontierF.peek()) < fB(frontierB.peek()))
                 solution = proceed(
-                        isFdirect = true,
+                        isF = true,
                         problem = problemF,
                         frontier = frontierF,
                         reached = reachedF,
@@ -351,7 +355,7 @@ object Agent {
                 )
             else
                 solution = proceed(
-                        isFdirect = false,
+                        isF = false,
                         problem = problemB,
                         frontier = frontierB,
                         reached = reachedB,
