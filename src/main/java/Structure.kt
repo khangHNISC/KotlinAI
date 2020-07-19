@@ -100,7 +100,7 @@ open class Node(
         val state: State,
         var parent: Node? = null,
         private val action: Action? = null,
-        private val pathCost: Int = 0
+        private val pathCost: Int = 0 //cost so far
 ) : Comparable<Node> {
     private var depth: Int = 0
     var fValue: Int = 0
@@ -121,7 +121,7 @@ open class Node(
     /**
      * construct childNode from this Node
      */
-    private fun childNode(problem: Problem, action: Action): Node {
+    fun childNode(problem: Problem, action: Action): Node {
         val nextState = problem.result(state, action)
         return Node(nextState, this, action, problem.pathCost(pathCost, state, action, nextState))
     }

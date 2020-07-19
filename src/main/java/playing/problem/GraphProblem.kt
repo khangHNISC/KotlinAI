@@ -10,7 +10,7 @@ import java.util.*
 class GraphProblem(
         override val initial: State,
         override val goal: List<State>,
-        private val graph: Graph //delegation
+        val graph: Graph //delegation
 ) : Problem(initial, goal) {
 
     override fun actions(state: State): List<Action> {

@@ -1,5 +1,6 @@
 package playing.agent
 
+import Action
 import Node
 import NodeCutOff
 import Problem
@@ -299,18 +300,11 @@ object Agent {
         ): Node? {
             fun joinNodes(isF: Boolean, nodeA: Node, nodeB: Node): Node? {
                 fun join2Node(startNode: Node, endNode: Node): Node? {
-                    //B f s a
-                    var travelNode: Node? = endNode
+                    var travelNode: Node? = endNode.parent
                     var nodeResult = startNode
                     while (travelNode != null) {
-                        if (travelNode != nodeResult) {
-                            val temp = travelNode.parent
-                            travelNode.parent = nodeResult
-                            nodeResult = travelNode
-                            travelNode = temp
-                        } else {
-                            travelNode = travelNode.parent
-                        }
+                        nodeResult = nodeResult.childNode(problem, Action(travelNode.state, (problem as GraphProblem).graph.getCost(nodeResult.state, travelNode.state)))
+                        travelNode = travelNode.parent
                     }
                     return nodeResult
                 }
@@ -322,11 +316,9 @@ object Agent {
             for (child in node.expand(problem)) {
                 val s = child.state
                 if (s !in reached || child.g() < reached[s]!!.g()) {
-                    //if not in reached or in reached but found better
                     reached[s] = child
                     frontier.add(child)
                     if (s in reached2) {
-                        //some how reached2[s] = R -> B -> P -> F
                         val localSolution = joinNodes(isF, child, reached2[s]!!)
                         if (localSolution?.g()!! < solution?.g() ?: Int.MAX_VALUE) {
                             refSolution = localSolution
@@ -354,7 +346,7 @@ object Agent {
                         solution = solution
                 )
             else
-                solution = proceed(
+                    solution = proceed(
                         isF = false,
                         problem = problemB,
                         frontier = frontierB,
